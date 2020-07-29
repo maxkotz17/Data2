@@ -47,10 +47,10 @@ my_cmap = mcolors.LinearSegmentedColormap.from_list('my_colormap', colors)
 degree_sign= u'\N{DEGREE SIGN}'
 
 models=['GFDL-ESM4','IPSL-CM6A-LR','MPI-ESM1-2-HR','MRI-ESM2-0','UKESM1-0-LL','CanESM5','CNRM-CM6-1','CNRM-ESM2-1','EC-Earth3','MIROC6']
-ssps=['ssp126','ssp585']
 
 model_is=[0,1,2,3,4,5,6,7,8,9]
 #plot panel of components and time series
+seas='JJA'
 
 for z in range(len(model_is)):
 	model=models[model_is[z]]
@@ -61,8 +61,8 @@ for z in range(len(model_is)):
 	LFP=[]
 	LFC=[]
 	for i in range(4):
-		LFP.append(np.load(folder + 'hi_era_var_T_LFP_' + str(i) + '.npy').transpose())
-		LFC.append(np.load(folder + 'hi_era_var_T_LFC_' + str(i) + '.npy'))
+		LFP.append(np.load(folder + seas + '_his_var_T_LFP_' + str(i) + '.npy').transpose())
+		LFC.append(np.load(folder + seas + '_his_var_T_LFC_' + str(i) + '.npy'))
 
 	#swith the sign of first component so that the trend is growing
 	LFC[0]=-LFC[0]
@@ -80,7 +80,7 @@ for z in range(len(model_is)):
 	vmax=1
 	divnorm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
 
-	time=np.linspace(1975,2014,len(LFC[0]))		
+	time=np.linspace(1950,2015,len(LFC[0]))		
 
 	fig=plt.figure(constrained_layout=True,figsize=(20,12))
 	widths=[10,10]
@@ -111,7 +111,7 @@ for z in range(len(model_is)):
 	labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 	cbar.set_ticklabels(labels)
 
-	plt.savefig('LFCA_plots/historical/' + model + '/LFCA_panel_hi_era_' + model + '.png',bbox_inches='tight')
+	plt.savefig('LFCA_plots/historical/' + model + '/LFCA_panel' + seas + '_his_' + model + '.png',bbox_inches='tight')
 	plt.close()
 	
 	fig=plt.figure(constrained_layout=True,figsize=(20,12))
@@ -143,7 +143,7 @@ for z in range(len(model_is)):
 	labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 	cbar.set_ticklabels(labels)
 		
-	plt.savefig('LFCA_plots/historical/' + model + '/LFCA_panel_hi_era_' + model + '_cont.png',bbox_inches='tight')
+	plt.savefig('LFCA_plots/historical/' + model + '/LFCA_panel_hi_' + model + '_cont.png',bbox_inches='tight')
 	plt.close()
 
 #plot all time series and all spatial patterns together
@@ -157,13 +157,13 @@ for z in range(len(model_is)):
 
 	LFC=[]
 	for i in range(4):
-		LFC.append(np.load(folder + 'hi_era_var_T_LFC_' + str(i) + '.npy'))
+		LFC.append(np.load(folder + seas + '_his_var_T_LFC_' + str(i) + '.npy'))
 
 	#swith the sign of first component so that the trend is growing
 	LFC[0]=-LFC[0]
 	smoothed=tukey(LFC[0],0.5,120)
 
-	time=np.linspace(1975,2014,len(LFC[0]))
+	time=np.linspace(1950,2015,len(LFC[0]))
 
 	ax=fig.add_subplot(spec[int(z/2),z%2])
 	ax.plot(time,LFC[0],alpha=0.2,c='gray')
@@ -174,7 +174,7 @@ for z in range(len(model_is)):
 	ax.set_ylabel('Standard Deviations')
 	ax.set_title(model)
 
-plt.savefig('LFCA_plots/historical/LFC-0_hi_era_time_series.png')
+plt.savefig('LFCA_plots/historical/LFC-0_' + seas + '_his_time_series.png')
 plt.close()
 
 #plot all spatial patterns together
@@ -190,11 +190,12 @@ for z in range(len(model_is)):
 	folder='LFCA/historical/' + model + '/'
 	
 	LFP=[]
+	LFC=[]
 	for i in range(4):
-		LFP.append(np.load(folder + 'hi_era_var_T_LFP_' + str(i) + '.npy').transpose())
+		LFP.append(np.load(folder + seas + '_his_var_T_LFP_' + str(i) + '.npy').transpose())
 
 	LFP[0]=-LFP[0]
-
+	
 	lon_axis=np.linspace(-179,179,180)
 	lat_axis=np.linspace(-89,89,90)
 	lat_axis=np.flip(lat_axis)
@@ -215,18 +216,17 @@ cbar.set_ticks([vmin,0,vmax])
 labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 cbar.set_ticklabels(labels)
 
-plt.savefig('LFCA_plots/historical/LFC-0_hi_era_spatial_patterns_cont.png',bbox_inches='tight')
+plt.savefig('LFCA_plots/historical/LFC-0_' + seas + '_his_spatial_patterns_cont.png',bbox_inches='tight')
 plt.close()
 
 #plot all end of century differences together on one plot
-fig=plt.figure(constrained_layout=False,figsize=(41,10.2))
-widths=[10,10,10,10]
+fig=plt.figure(constrained_layout=False,figsize=(15,12))
+widths=[7,7]
 heights=[2,2,2,2,2]
-spec=fig.add_gridspec(ncols=4,nrows=5,width_ratios=widths,height_ratios=heights,wspace=0.1,hspace=0)
+spec=fig.add_gridspec(ncols=2,nrows=5,width_ratios=widths,height_ratios=heights)
 vmin=-0.5
 vmax=0.5
 divnorm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
-ax=[]
 for z in range(len(model_is)):
 	model=models[model_is[z]]
 	folder='LFCA/historical/' + model + '/'
@@ -235,8 +235,8 @@ for z in range(len(model_is)):
 	LFC=[]
 	
 	for i in range(4):
-		LFP.append(np.load(folder + 'hi_era_var_T_LFP_' + str(i) + '.npy').transpose())
-		LFC.append(np.load(folder + 'hi_era_var_T_LFC_' + str(i) + '.npy'))
+		LFP.append(np.load(folder + seas + '_his_var_T_LFP_' + str(i) + '.npy').transpose())
+		LFC.append(np.load(folder + seas + '_his_var_T_LFC_' + str(i) + '.npy'))
 	LFP[0]=-LFP[0]
 	LFC[0]=-LFC[0]
 	
@@ -251,57 +251,35 @@ for z in range(len(model_is)):
 	vmin=-0.5
 	vmax=0.5
 	divnorm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
-
-	smoothed=tukey(LFC[0],0,120)
-	time=np.linspace(1975,2014,len(LFC[0]))
-
-	ax.append(fig.add_subplot(spec[int(z/2),z%2]))
-	ax[z*2].plot(time,LFC[0],alpha=0.2,c='gray')
-	ax[z*2].plot(time,smoothed,alpha=1,c='k')
-	ax[z*2].set_ylim(-2,2)
-	ax[z*2].set_xlim(time[0],time[-1])
-	if (z%2)==0:
-		ax[z*2].set_ylabel('LFC-0',fontsize=15)
-		ax[z*2].tick_params(labelsize=10)
-	else:
-		ax[z*2].tick_params(labelleft=False)
-	if z>7:
-		ax[z*2].set_xlabel('Year',fontsize=15)
-		ax[z*2].tick_params(labelsize=10)
-	else:
-		ax[z*2].tick_params(labelbottom=False)
-	ax[z*2].set_title(model,fontsize=15)
-	ax[z*2].set_aspect(3.3)
-
-	ax.append(fig.add_subplot(spec[int(z/2),2+z%2]))
+	
+	ax=fig.add_subplot(spec[int(z/2),z%2])
 #	map0.contourf(xx,yy,LFP[0],15,cmap=my_cmap,norm=divnorm,ax=ax)
-	map0.pcolormesh(xx,yy,decade_diff,cmap=my_cmap,norm=divnorm,ax=ax[2*z+1])
-	map0.drawcoastlines(ax=ax[2*z+1])
-	ax[2*z+1].set_title(model,fontsize=15)
-	ax[2*z+1].set_ylim([-60,80])
+	map0.pcolormesh(xx,yy,LFP[0],cmap=my_cmap,norm=divnorm,ax=ax)
+	map0.drawcoastlines(ax=ax)
+	ax.set_title(model)
+	ax.set_ylim([-60,80])
 
-axins=inset_axes(ax[11],width='3%',height='150%',loc='center right',bbox_to_anchor=(0.1,0,1,1),bbox_transform=ax[11].transAxes,borderpad=0,)
+axins=inset_axes(ax,width='100%',height='5%',loc='lower center',bbox_to_anchor=(-0.52,-0.1,1,1),bbox_transform=ax.transAxes,borderpad=0,)
 sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=divnorm)
-cbar=fig.colorbar(sm,cax=axins,orientation='vertical')
+cbar=fig.colorbar(sm,cax=axins,orientation='horizontal')
 cbar.set_ticks([vmin,0,vmax])
 labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 cbar.set_ticklabels(labels)
-cbar.ax.tick_params(labelsize=15)
-plt.savefig('LFCA_plots/historical/LFC-0_hi_era_dec_diff.png')#,bbox_inches='tight')
+plt.savefig('LFCA_plots/historical/LFC-0_' + seas + '_his_dec_diff.png',bbox_inches='tight')
 plt.close()
 
 #plot panel of LFC-0 pattern, time series and final decade difference
-
+ssp='ssp585'
 for z in range(len(model_is)):
 	model=models[model_is[z]]
-	folder='LFCA/historical/' + model + '/'
+	folder='LFCA/' + ssp + '/' + model + '/'
 	
 	LFP=[]
 	LFC=[]
 	
 	for i in range(4):
-		LFP.append(np.load(folder + 'hi_era_var_T_LFP_' + str(i) + '.npy').transpose())
-		LFC.append(np.load(folder + 'hi_era_var_T_LFC_' + str(i) + '.npy'))
+		LFP.append(np.load(folder + 'var_T_LFP_' + str(i) + '.npy').transpose())
+		LFC.append(np.load(folder + 'var_T_LFC_' + str(i) + '.npy'))
 	LFP[0]=-LFP[0]
 	LFC[0]=-LFC[0]
 	
@@ -334,7 +312,7 @@ for z in range(len(model_is)):
 	labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 	cbar.set_ticklabels(labels)
 
-	time=np.linspace(1975,2015,len(LFC[0]))
+	time=np.linspace(2015,2100,len(LFC[0]))
 	smoothed=tukey(LFC[0],0.5,120)
 	axt=fig.add_subplot(spec[1,0])
 	axt.plot(time,LFC[0],alpha=0.4,c='gray')
@@ -349,7 +327,7 @@ for z in range(len(model_is)):
 	axd=fig.add_subplot(spec[:,1])
 	map0.pcolormesh(xx,yy,decade_diff,cmap=my_cmap,norm=divnorm,ax=axd)
 	map0.drawcoastlines(ax=axd)
-	axd.set_title('2005-2015 from 1975-1985, estimated from LFC-0')
+	axd.set_title('2090-2100 from 2015-2025, estimated from LFC-0')
 	axd.set_ylim([-60,80])
 
 	axins=inset_axes(axd,width='66%',height='5%',loc='lower center',bbox_to_anchor=(0,-0.1,1,1),bbox_transform=axd.transAxes,borderpad=0,)
@@ -359,79 +337,6 @@ for z in range(len(model_is)):
 	labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
 	cbar.set_ticklabels(labels)
 	
-	plt.savefig('LFCA_plots/historical/' + model + '/' + 'LFCA_hi_era_process.png',bbox_inches='tight')
+	plt.savefig('LFCA_plots/' + ssp + '/' + model + '/' + 'LFCA_process.png',bbox_inches='tight')
 	plt.close()	
 
-#anders preferred plotting
-h1=10*140/360-1.2
-h2=h1/2
-h3=h2/2
-ht=5*(h1+h2+h3)
-fig=plt.figure(constrained_layout=False,figsize=(21,ht))
-widths=[10,10]
-heights=[h1,h2,h3,h1,h2,h3,h1,h2,h3,h1,h2,h3,h1,h2,h3]
-spec=fig.add_gridspec(ncols=2,nrows=15,width_ratios=widths,height_ratios=heights,wspace=0.11,hspace=0)
-vmin=-1
-vmax=0.5
-divnorm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
-ax=[]
-for z in range(len(model_is)):
-        model=models[model_is[z]]
-        folder='LFCA/historical/' + model + '/'
-
-        LFP=[]
-        LFC=[]
-
-        for i in range(4):
-                LFP.append(np.load(folder + 'hi_era_var_T_LFP_' + str(i) + '.npy').transpose())
-                LFC.append(np.load(folder + 'hi_era_var_T_LFC_' + str(i) + '.npy'))
-        LFP[0]=-LFP[0]
-        LFC[0]=-LFC[0]
-
-        time=np.linspace(1975,2015-1/12,len(LFC[0]))
-        smoothed=tukey(LFC[0],0,120)
-
-        ax.append(fig.add_subplot(spec[int(z/2)*3+1,z%2]))
-#       fig.subplots_adjust(top=21-3-(int(z/2)*4.3))
-        ax[z*2].plot(time,LFC[0],alpha=0.2,c='gray')
-        ax[z*2].plot(time,smoothed,alpha=1,c='k')
-        ax[z*2].set_ylim(-2,2)
-        ax[z*2].set_xlim(time[0],time[-1])
-        if z>7:
-                ax[z*2].set_xlabel('Year',fontsize=15)
-        ax[z*2].tick_params(labelsize=10)
-        if z%2==0:
-                ax[z*2].set_ylabel('LFC-0',fontsize=15)
-        ax[z*2].tick_params(labelsize=10)
-        ax[z*2].set_xticks([1980,1990,2000,2010])
-        ax[z*2].set_aspect('auto')
-#       ax[z*2].tick_params(labelbottom=False)
-        decade_diff=LFP[0]*(np.mean(np.real(LFC[0][-120:]))-np.mean(np.real(LFC[0][:120])))
-
-        lon_axis=np.linspace(-179,179,180)
-        lat_axis=np.linspace(-89,89,90)
-        lat_axis=np.flip(lat_axis)
-        xx, yy = np.meshgrid(lon_axis,lat_axis)
-        map0=Basemap(projection='cyl')
-
-        vmin=-1
-        vmax=0.5
-        divnorm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
-
-        ax.append(fig.add_subplot(spec[int(z/2)*3,z%2]))
-        #map0.contourf(xx,yy,LFP[0],15,cmap=my_cmap,norm=divnorm,ax=ax)
-        map0.pcolormesh(xx,yy,decade_diff,cmap=my_cmap,norm=divnorm,ax=ax[z*2+1])
-        map0.drawcoastlines(ax=ax[z*2+1])
-        ax[2*z+1].set_title(model,fontsize=15)
-        ax[2*z+1].set_ylim([-60,80])
-#       fig.subplots_adjust(bottom=21-(int(z/2)*4.3))
-
-axins=inset_axes(ax[11],width='3%',height='150%',loc='center right',bbox_to_anchor=(0.1,-0.25,1,1),bbox_transform=ax[11].transAxes,borderpad=0,)
-sm = plt.cm.ScalarMappable(cmap=my_cmap, norm=divnorm)
-cbar=fig.colorbar(sm,cax=axins,orientation='vertical')
-cbar.set_ticks([vmin,0,vmax])
-labels=[str(vmin) + degree_sign + 'C','0' + degree_sign + 'C',str(vmax) + degree_sign + 'C']
-cbar.set_ticklabels(labels)
-cbar.ax.tick_params(labelsize=15)
-plt.savefig('EDFig10.png',bbox_inches='tight')
-plt.close()
